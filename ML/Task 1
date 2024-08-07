@@ -1,0 +1,86 @@
+# DEP ML Task 1
+# By Muhammad Saad Faran Malik
+
+# Predicting House Prices:
+# Objective: Build a model to predict house prices
+# based on various features.
+# Description: Use a dataset containing information about houses (e.g., size, number of bedrooms, location) to create a predictive model that estimates the price of a house.
+# Key Steps:
+# Data cleaning and preprocessing
+# Feature engineering
+# Model selection and training (e.g., linear regression)
+# Model evaluation and fine-tuning
+
+# Solution:
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
+
+# Load the dataset
+file_path = '/Users/saadfaran/Downloads/Housing.csv'
+df = pd.read_csv(file_path)
+
+# Display the first few rows of the dataset
+print(df.head())
+
+# Data cleaning and preprocessing
+# Check for missing values
+print(df.isnull().sum())
+
+# Drop rows with missing target values
+df = df.dropna(subset=['price'])
+
+# Fill missing values for features if any
+df = df.fillna(df.mean())
+
+# Feature engineering
+# Convert categorical features to numeric if necessary
+df = pd.get_dummies(df, drop_first=True)
+
+# Define features and target
+X = df.drop('price', axis=1)
+y = df['price']
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Standardize the features
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Model selection and training
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Model evaluation
+y_pred_train = model.predict(X_train)
+y_pred_test = model.predict(X_test)
+
+# Evaluate the model
+mse_train = mean_squared_error(y_train, y_pred_train)
+mse_test = mean_squared_error(y_test, y_pred_test)
+r2_train = r2_score(y_train, y_pred_train)
+r2_test = r2_score(y_test, y_pred_test)
+
+print(f'Train MSE: {mse_train}')
+print(f'Test MSE: {mse_test}')
+print(f'Train R^2: {r2_train}')
+print(f'Test R^2: {r2_test}')
+
+# Fine-tuning the model using GridSearchCV (if necessary)
+# In this case, we'll skip this step as LinearRegression doesn't have hyperparameters to tune
+
+# Plotting the results
+plt.figure(figsize=(10, 5))
+plt.scatter(y_test, y_pred_test)
+plt.xlabel('Actual Prices')
+plt.ylabel('Predicted Prices')
+plt.title('Actual vs Predicted Prices')
+plt.show()
